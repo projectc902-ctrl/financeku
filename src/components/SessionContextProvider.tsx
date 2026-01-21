@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface SessionContextType {
   session: Session | null;
   supabase: SupabaseClient;
+  loading: boolean; // Added loading property
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -38,7 +39,7 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
   }
 
   return (
-    <SessionContext.Provider value={{ session, supabase }}>
+    <SessionContext.Provider value={{ session, supabase, loading }}>
       {children}
     </SessionContext.Provider>
   );

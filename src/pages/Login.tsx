@@ -33,15 +33,13 @@ const Login = () => {
                   brandAccent: 'hsl(217.2 91.2% 59.8%)', // Accent color for hover
                   inputBackground: 'hsl(210 40% 96.1%)', // Light background for inputs
                   inputBorder: 'hsl(214.3 31.8% 91.4%)', // Light border for inputs
-                  inputFocusBorder: 'hsl(217.2 91.2% 59.8%)', // Focus border color
                   inputText: 'hsl(222.2 84% 4.9%)', // Dark text for inputs
                   messageText: 'hsl(222.2 84% 4.9%)', // Message text color
                   messageBackground: 'hsl(210 40% 96.1%)', // Message background
                 },
                 radii: {
                   borderRadiusButton: '0.75rem', // Rounded buttons
-                  button: '0.75rem',
-                  input: '0.75rem',
+                  inputBorderRadius: '0.75rem', // Corrected property name
                 },
               },
             },
