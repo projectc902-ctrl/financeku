@@ -7,10 +7,11 @@ import { DollarSign, TrendingUp, TrendingDown, Wallet, CalendarDays, Plus, Eye, 
 import ExpenseByCategoryChart from '@/components/charts/ExpenseByCategoryChart';
 import IncomeExpenseLineChart from '@/components/charts/IncomeExpenseLineChart';
 import QuickActionsFAB from '@/components/QuickActionsFAB';
-import { Progress } from '@/components/ui/progress';
+import { CustomProgress } from '@/components/CustomProgress'; // Import CustomProgress
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale'; // Import Indonesian locale
+import { cn } from '@/lib/utils'; // Import cn utility
 
 // Placeholder data types
 interface CategoryData {
@@ -173,7 +174,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">Rp {remainingBudget.toLocaleString('id-ID')}</div>
             <p className="text-xs text-purple-200">Target: Rp {budgetTarget.toLocaleString('id-ID')}</p>
-            <Progress value={budgetProgress} className="h-2 mt-2" indicatorColor={
+            <CustomProgress value={budgetProgress} className="h-2 mt-2" indicatorColor={
               budgetProgress < 50 ? "bg-green-400" : budgetProgress < 80 ? "bg-yellow-400" : "bg-red-400"
             } />
           </CardContent>
@@ -197,7 +198,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-gray-800 dark:text-gray-200">{item.name}</p>
-                  <Progress value={item.percentage} className="h-2 mt-1" indicatorColor={item.color} />
+                  <CustomProgress value={item.percentage} className="h-2 mt-1" indicatorColor={item.color} />
                 </div>
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Rp {item.amount.toLocaleString('id-ID')}</span>
               </div>
