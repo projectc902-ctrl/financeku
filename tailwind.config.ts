@@ -118,8 +118,31 @@ export default {
       },
       backgroundImage: {
         'gradient-myfinance': 'linear-gradient(to right, var(--tw-gradient-stops))',
-      }
+      },
+      textShadow: { // Custom text-shadow utility
+        sm: '0 1px 2px var(--tw-shadow-color)',
+        DEFAULT: '0 2px 4px var(--tw-shadow-color)',
+        lg: '0 8px 16px var(--tw-shadow-color)',
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities, theme }: any) {
+      addUtilities({
+        '.text-shadow-sm': {
+          textShadow: '0 1px 2px var(--tw-shadow-color, rgba(0, 0, 0, 0.1))',
+        },
+        '.text-shadow': {
+          textShadow: '0 2px 4px var(--tw-shadow-color, rgba(0, 0, 0, 0.1))',
+        },
+        '.text-shadow-lg': {
+          textShadow: '0 8px 16px var(--tw-shadow-color, rgba(0, 0, 0, 0.1))',
+        },
+        '.text-shadow-none': {
+          textShadow: 'none',
+        },
+      });
+    },
+  ],
 } satisfies Config;

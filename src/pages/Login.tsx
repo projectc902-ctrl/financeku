@@ -58,7 +58,13 @@ const Login = () => {
 
     if (error) {
       setError("password", { message: error.message });
-      toast.error("Gagal masuk", { description: error.message });
+      let errorMessage = error.message;
+      if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Email Anda belum diverifikasi. Silakan cek kotak masuk Anda.";
+      } else if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Kredensial login tidak valid. Periksa email dan kata sandi Anda.";
+      }
+      toast.error("Gagal masuk", { description: errorMessage });
     } else {
       toast.success("Berhasil masuk!", { description: "Anda akan diarahkan ke dashboard." });
       navigate('/dashboard');

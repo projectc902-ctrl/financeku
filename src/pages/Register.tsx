@@ -100,7 +100,7 @@ const Register = () => {
       password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: fullName, // Pass full_name to raw_user_meta_data
           username: username,
         },
       },
@@ -110,8 +110,9 @@ const Register = () => {
       setError("email", { message: error.message }); // Generic error for now
       toast.error("Gagal mendaftar", { description: error.message });
     } else {
-      toast.success("Pendaftaran berhasil!", { description: "Silakan cek email Anda untuk verifikasi." });
-      navigate('/login'); // Redirect to login after successful registration
+      toast.success("Pendaftaran berhasil!", { description: "Silakan cek email Anda untuk verifikasi sebelum masuk." });
+      // Optionally, you might want to redirect to a "check your email" page or back to login
+      navigate('/login');
     }
     setLoading(false);
   };
@@ -203,7 +204,7 @@ const Register = () => {
               {password && (
                 <div className="mt-2">
                   <Progress value={passwordStrength} className={cn("h-2", getStrengthColor(passwordStrength))} />
-                  <span className={cn("text-xs mt-1 block", passwordStrength < 50 ? "text-red-500" : passwordStrength < 75 ? "text-yellow-500" : "text-green-500")}>
+                  <span className="text-xs mt-1 block" style={{ color: getStrengthColor(passwordStrength) }}>
                     Kekuatan: {getStrengthText(passwordStrength)}
                   </span>
                 </div>
