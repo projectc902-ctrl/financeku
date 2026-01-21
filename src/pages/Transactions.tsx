@@ -3,7 +3,7 @@ import { useSession } from '@/components/SessionContextProvider';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form'; // Corrected import path
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import * as z from 'zod'; // Corrected import statement
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,10 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'; // Import Dialog components
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { CalendarIcon, DollarSign, Tag, NotebookPen, Plus, Edit, Trash2, Search, Filter, ArrowUpWideNarrow, ArrowDownWideNarrow, TrendingUp, TrendingDown } from 'lucide-react';
+import { CalendarIcon, DollarSign, Tag, NotebookPen, Plus, Edit, Trash2, Search, Filter, ArrowUpWideNarrow, ArrowDownWideNarrow, TrendingUp, TrendingDown, Check, Utensils, Car, ShoppingBag, Receipt, Smile, Heart, GraduationCap, Briefcase, Gift, PiggyBank, Wallet, MoreHorizontal } from 'lucide-react'; // Added Wallet and Check icons
 import { formatCurrency, parseCurrency } from '@/utils/currency';
 
 // Schema for transaction form validation
@@ -31,13 +32,21 @@ const transactionSchema = z.object({
 
 type TransactionFormInputs = z.infer<typeof transactionSchema>;
 
-// Placeholder for Category and Transaction types
+// Schema for category form validation (re-used from Categories.tsx)
+const categorySchema = z.object({
+  name: z.string().min(1, { message: "Nama kategori tidak boleh kosong." }).max(50, { message: "Nama kategori maksimal 50 karakter." }),
+  type: z.enum(['income', 'expense'], { message: "Jenis kategori harus dipilih." }),
+  color: z.string().min(1, { message: "Warna kategori harus dipilih." }),
+});
+
+type CategoryFormInputs = z.infer<typeof categorySchema>;
+
 interface Category {
   id: string;
   name: string;
   type: 'income' | 'expense';
-  color?: string; // Optional color for categories
-  icon?: React.ReactNode; // Optional icon for categories
+  color: string;
+  icon?: string;
 }
 
 interface Transaction {
@@ -51,6 +60,29 @@ interface Transaction {
   createdAt: Date;
 }
 
+const defaultCategoryIcons: Record<string, React.ReactNode> = {
+  'Utensils': <Utensils className="h-5 w-5" />,
+  'Car': <Car className="h-5 w-5" />,
+  'ShoppingBag': <ShoppingBag className="h-5 w-5" />,
+  'Receipt': <Receipt className="h-5 w-5" />,
+  'Smile': <Smile className="h-5 w-5" />,
+  'Heart': <Heart className="h-5 w-5" />,
+  'GraduationCap': <GraduationCap className="h-5 w-5" />,
+  'Briefcase': <Briefcase className="h-5 w-5" />,
+  'Gift': <Gift className="h-5 w-5" />,
+  'PiggyBank': <PiggyBank className="h-5 w-5" />,
+  'Wallet': <Wallet className="h-5 w-5" />,
+  'TrendingUp': <TrendingUp className="h-5 w-5" />,
+  'TrendingDown': <TrendingDown className="h-5 w-5" />,
+  'MoreHorizontal': <MoreHorizontal className="h-5 w-5" />,
+};
+
+const categoryColors = [
+  '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#A1C4FD', '#FFD700', '#ADFF2F',
+  '#FF4500', '#8A2BE2', '#00CED1', '#FF1493', '#7FFF00', '#DC143C', '#00BFFF', '#FFDAB9', '#800080', '#6A5ACD'
+];
+
+
 const Transactions = () => {
   const { session, supabase } = useSession();
   const navigate = useNavigate();
@@ -62,6 +94,7 @@ const Transactions = () => {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterDateRange, setFilterDateRange] = useState<{ from?: Date; to?: Date }>({});
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc'); // Default latest first
+  const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
 
   const {
     register,
@@ -81,9 +114,28 @@ const Transactions = () => {
     },
   });
 
+  const {
+    register: registerCategory,
+    handleSubmit: handleCategorySubmit,
+    setValue: setCategoryValue,
+    watch: watchCategory,
+    reset: resetCategoryForm,
+    formState: { errors: categoryErrors },
+  } = useForm<CategoryFormInputs>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: '',
+      type: 'expense',
+      color: categoryColors[0],
+    },
+  });
+
   const watchedAmount = watch('amount');
   const watchedNotes = watch('notes');
   const watchedTransactionDate = watch('transactionDate');
+  const watchedCategoryType = watchCategory('type');
+  const watchedCategoryColor = watchCategory('color');
+
 
   useEffect(() => {
     if (!session) {
@@ -104,7 +156,8 @@ const Transactions = () => {
 
   useEffect(() => {
     setValue('type', transactionType);
-  }, [transactionType, setValue]);
+    setCategoryValue('type', transactionType); // Sync category type with transaction type
+  }, [transactionType, setValue, setCategoryValue]);
 
   const fetchCategories = async () => {
     if (!session) return;
@@ -169,10 +222,8 @@ const Transactions = () => {
     setLoading(true);
     const parsedAmount = parseCurrency(data.amount);
 
-    const { error } = await supabase.auth.getUser(); // Ensure user is authenticated
-
-    if (error) {
-      toast.error("Autentikasi gagal", { description: error.message });
+    if (!session?.user?.id) {
+      toast.error("Autentikasi gagal", { description: "Pengguna tidak terautentikasi." });
       setLoading(false);
       return;
     }
@@ -180,7 +231,7 @@ const Transactions = () => {
     const { error: insertError } = await supabase
       .from('transactions')
       .insert({
-        user_id: session?.user?.id,
+        user_id: session.user.id,
         type: data.type,
         amount: parsedAmount,
         category_id: data.category,
@@ -204,6 +255,31 @@ const Transactions = () => {
     }
     setLoading(false);
   };
+
+  const onAddCategorySubmit = async (data: CategoryFormInputs) => {
+    setLoading(true);
+    if (!session?.user?.id) {
+      toast.error("Autentikasi gagal", { description: "Pengguna tidak terautentikasi." });
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('categories')
+      .insert({ user_id: session.user.id, name: data.name, type: data.type, color: data.color });
+
+    if (error) {
+      console.error('Error adding category:', error);
+      toast.error("Gagal menambahkan kategori", { description: error.message });
+    } else {
+      toast.success("Kategori berhasil ditambahkan!");
+      setIsAddCategoryDialogOpen(false);
+      resetCategoryForm();
+      fetchCategories(); // Refresh categories in the transaction form
+    }
+    setLoading(false);
+  };
+
 
   const groupedTransactions = transactions.reduce((acc, transaction) => {
     const dateKey = format(transaction.transactionDate, 'yyyy-MM-dd');
@@ -320,7 +396,7 @@ const Transactions = () => {
                     ))}
                     {/* Quick add category button */}
                     <div className="p-2 border-t mt-2">
-                      <Button variant="ghost" className="w-full justify-start text-myfinance-primary-light">
+                      <Button variant="ghost" className="w-full justify-start text-myfinance-primary-light" onClick={() => setIsAddCategoryDialogOpen(true)}>
                         <Plus className="h-4 w-4 mr-2" /> Tambah Kategori Baru
                       </Button>
                     </div>
@@ -513,6 +589,88 @@ const Transactions = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog for adding new category from Transactions page */}
+      <Dialog open={isAddCategoryDialogOpen} onOpenChange={setIsAddCategoryDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Tambah Kategori Baru
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCategorySubmit(onAddCategorySubmit)} className="space-y-5 py-4">
+            <div>
+              <Label htmlFor="categoryName">Nama Kategori</Label>
+              <Input
+                id="categoryName"
+                placeholder="Contoh: Makanan, Gaji"
+                className={cn("mt-1 rounded-xl focus:border-myfinance-primary-light focus:ring-1 focus:ring-myfinance-primary-light transition-all", categoryErrors.name && "border-red-500")}
+                {...registerCategory("name")}
+              />
+              {categoryErrors.name && <p className="text-red-500 text-sm mt-1 animate-slide-down">{categoryErrors.name.message}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="categoryType">Jenis Kategori</Label>
+              <Select onValueChange={(value: 'income' | 'expense') => setCategoryValue('type', value)} value={watchedCategoryType}>
+                <SelectTrigger className={cn("w-full mt-1 rounded-xl focus:border-myfinance-primary-light focus:ring-1 focus:ring-myfinance-primary-light transition-all", categoryErrors.type && "border-red-500")}>
+                  <SelectValue placeholder="Pilih jenis" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="expense">Pengeluaran</SelectItem>
+                  <SelectItem value="income">Pendapatan</SelectItem>
+                </SelectContent>
+              </Select>
+              {categoryErrors.type && <p className="text-red-500 text-sm mt-1 animate-slide-down">{categoryErrors.type.message}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="categoryColor">Warna Kategori</Label>
+              <div className="grid grid-cols-6 gap-2 mt-1">
+                {categoryColors.map((colorOption) => (
+                  <div
+                    key={colorOption}
+                    className={cn(
+                      "w-8 h-8 rounded-full cursor-pointer border-2 transition-all duration-150",
+                      watchedCategoryColor === colorOption ? 'border-myfinance-primary-light scale-110' : 'border-transparent hover:scale-105'
+                    )}
+                    style={{ backgroundColor: colorOption }}
+                    onClick={() => setCategoryValue('color', colorOption)}
+                  >
+                    {watchedCategoryColor === colorOption && (
+                      <Check className="h-full w-full text-white p-1" />
+                    )}
+                  </div>
+                ))}
+              </div>
+              {categoryErrors.color && <p className="text-red-500 text-sm mt-1 animate-slide-down">{categoryErrors.color.message}</p>}
+            </div>
+
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={() => setIsAddCategoryDialogOpen(false)} className="rounded-xl">
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-emerald-green to-teal-blue hover:from-emerald-green/90 hover:to-teal-blue/90 text-white rounded-xl shadow-md"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Menyimpan...
+                  </span>
+                ) : (
+                  'Tambah Kategori'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

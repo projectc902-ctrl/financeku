@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register"; // Import Register page
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions"; // Import Transactions page
+import Categories from "./pages/Categories"; // Import Categories page
 import { SessionContextProvider, useSession } from "./components/SessionContextProvider";
 import React from "react";
 import MainLayout from "./components/MainLayout";
@@ -43,7 +44,7 @@ const AppContent = () => (
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/transactions" element={<PrivateRoute><Transactions /></PrivateRoute>} /> {/* Add Transactions route */}
-          <Route path="/categories" element={<PrivateRoute><div>Halaman Kategori</div></PrivateRoute>} />
+          <Route path="/categories" element={<PrivateRoute><Categories /></PrivateRoute>} /> {/* Add Categories route */}
           <Route path="/budgets" element={<PrivateRoute><div>Halaman Anggaran</div></PrivateRoute>} />
           <Route path="/reports" element={<PrivateRoute><div>Halaman Laporan</div></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><div>Halaman Pengaturan</div></PrivateRoute>} />
