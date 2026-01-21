@@ -1,6 +1,6 @@
-export const formatCurrency = (amount: number | string): string => {
+export const formatCurrency = (amount: number | string | null | undefined): string => {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  if (isNaN(num)) {
+  if (num === null || num === undefined || isNaN(num)) {
     return "Rp 0";
   }
   return `Rp ${num.toLocaleString('id-ID')}`;
