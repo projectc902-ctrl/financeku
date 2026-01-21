@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, User, Lock, Mail, Flag, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form'; // Import Controller
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
@@ -47,10 +47,14 @@ const Register = () => {
     register,
     handleSubmit,
     watch,
+    control, // Get control from useForm
     formState: { errors },
     setError,
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      termsAccepted: false, // Set a default boolean value
+    }
   });
 
   const password = watch("password");
@@ -249,7 +253,18 @@ const Register = () => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Checkbox id="termsAccepted" className="rounded-md border-gray-300 text-myfinance-primary-light focus:ring-myfinance-primary-light" {...register("termsAccepted")} />
+              <Controller
+                name="termsAccepted"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="termsAccepted"
+                    className="rounded-md border-gray-300 text-myfinance-primary-light focus:ring-myfinance-primary-light"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
               <Label htmlFor="termsAccepted" className="text-sm text-gray-600 dark:text-gray-400">
                 Saya menyetujui <Link to="/terms" className="text-myfinance-primary-light hover:underline">syarat & ketentuan</Link>
               </Label>
