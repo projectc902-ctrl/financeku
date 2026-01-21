@@ -3,23 +3,31 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Index from "./pages/Index"; // Keep Index for now, though it might be replaced
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Register from "./pages/Register"; // Import Register page
 import Dashboard from "./pages/Dashboard";
 import { SessionContextProvider, useSession } from "./components/SessionContextProvider";
 import React from "react";
-import MainLayout from "./components/MainLayout"; // Import MainLayout
+import MainLayout from "./components/MainLayout";
 
 const queryClient = new QueryClient();
 
 // PrivateRoute component to protect routes
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { session } = useSession();
+  const { session, loading } = useSession();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <p className="text-lg text-gray-700 dark:text-gray-300">Memuat sesi...</p>
+      </div>
+    );
+  }
   if (!session) {
     return <Navigate to="/login" replace />;
   }
-  return <MainLayout>{children}</MainLayout>; // Wrap children with MainLayout
+  return <MainLayout>{children}</MainLayout>;
 };
 
 const AppContent = () => (
@@ -30,7 +38,8 @@ const AppContent = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> {/* Default route to dashboard */}
+          <Route path="/register" element={<Register />} /> {/* Add Register route */}
+          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           {/* Add placeholder routes for other sections */}
           <Route path="/transactions" element={<PrivateRoute><div>Halaman Transaksi</div></PrivateRoute>} />

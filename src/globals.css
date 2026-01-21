@@ -19,14 +19,20 @@
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
@@ -35,20 +41,23 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* MYFINANCE Custom Colors */
+    --myfinance-emerald-green: 160 70% 39%; /* #10b981 */
+    --myfinance-teal-blue: 172 70% 40%; /* #14b8a6 */
+    --myfinance-income: 160 70% 39%; /* #10b981 */
+    --myfinance-expense: 0 84% 60%; /* #ef4444 */
+    --myfinance-warning: 39 92% 50%; /* #f59e0b */
+    --myfinance-success: 130 65% 46%; /* #22c55e */
+    --myfinance-primary-light: 217 91% 59%; /* #3b82f6 */
+    --myfinance-neutral: 218 17% 47%; /* #64748b */
   }
 
   .dark {
@@ -87,6 +96,16 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* MYFINANCE Custom Colors for Dark Mode */
+    --myfinance-emerald-green: 160 70% 39%; /* #10b981 */
+    --myfinance-teal-blue: 172 70% 40%; /* #14b8a6 */
+    --myfinance-income: 160 70% 39%; /* #10b981 */
+    --myfinance-expense: 0 84% 60%; /* #ef4444 */
+    --myfinance-warning: 39 92% 50%; /* #f59e0b */
+    --myfinance-success: 130 65% 46%; /* #22c55e */
+    --myfinance-primary-light: 217 91% 59%; /* #3b82f6 */
+    --myfinance-neutral: 218 17% 47%; /* #64748b */
   }
 }
 
@@ -98,4 +117,9 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom gradient for MYFINANCE brand */
+.bg-gradient-myfinance {
+  background-image: linear-gradient(to right, var(--myfinance-emerald-green), var(--myfinance-teal-blue));
 }

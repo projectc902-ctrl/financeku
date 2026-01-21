@@ -62,11 +62,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom MYFINANCE colors
+        'emerald-green': '#10b981',
+        'teal-blue': '#14b8a6',
+        'myfinance-income': '#10b981',
+        'myfinance-expense': '#ef4444',
+        'myfinance-warning': '#f59e0b',
+        'myfinance-success': '#22c55e',
+        'myfinance-primary-light': '#3b82f6', // Accent blue
+        'myfinance-neutral': '#64748b', // Slate
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem", // Added for more rounded elements
+        "2xl": "1.5rem", // Added for even more rounded elements
       },
       keyframes: {
         "accordion-down": {
@@ -85,11 +96,29 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "slide-down": {
+          "0%": { opacity: "0", transform: "translateY(-10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "slide-down": "slide-down 0.3s ease-out forwards",
+        "float": "float 3s ease-in-out infinite",
       },
+      backgroundImage: {
+        'gradient-myfinance': 'linear-gradient(to right, var(--tw-gradient-stops))',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
