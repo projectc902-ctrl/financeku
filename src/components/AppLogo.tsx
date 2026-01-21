@@ -23,14 +23,14 @@ const AppLogo: React.FC<AppLogoProps> = ({
   const content = (
     <>
       <DollarSign className={cn(
-        "h-6 w-6 drop-shadow-md", // Added drop-shadow for 3D effect
+        "h-6 w-6 drop-shadow-lg", // Increased drop-shadow for more 3D effect
         iconClassName,
         animated && "animate-fade-in"
       )} />
       {showText && (
         <span className={cn(
           "font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-green to-teal-blue text-2xl",
-          "text-shadow-sm", // Added text-shadow for 3D effect
+          "text-shadow", // Using the new 'text-shadow' utility for more depth
           textClassName,
           animated && "animate-fade-in delay-100"
         )}>
